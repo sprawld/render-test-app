@@ -1,2 +1,6 @@
-# render-test-app
-Express app to run as a render.com web service
+
+# Test Express for running on Render
+
+- Runs demo svelte app
+- Express server
+
