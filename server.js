@@ -1,32 +1,51 @@
 
-const express = require("express");
-const Redis = require("ioredis");
+import express from "express";
 
-const { REDIS_URL = `localhost:6379`, PORT = 3001 } = process.env;
+import {autoroute} from './server/autoroute.js';
+import {db} from './server/redis.js'
+import {create_user, get_user} from './server/user.js';
+
+
+const { PORT = 3001 } = process.env;
 
 const app = express();
-const db = new Redis(REDIS_URL);
 
 app.use(express.json())
 app.use(express.static('public'));
 
-app.get('/gettxt', (req, res) => {
+autoroute(app, {
+    get: {
+        '/gettxt': () => {
+            return db.get('current').then(txt => ({txt}));
+        },
+        
+    },
+    
+    post: {
+        '/settxt': (req) => {
+        
+            console.log(`req`,req.body);
+            let {txt} = req.body;
+            console.log(`req ${txt}`, req.body)
+            db.set('current', txt);
+        
+            res.send({});
+        },
 
-    db.get('current').then(txt => {
-        res.send({txt})
-    });
+        '/login': async req => {
+            let {username, password} = req.body;
+            let res = await get_user(username, password);
+            return res;
+        },
+
+        '/user/create': async req => {
+            let {username, password} = req.body;
+            let res = await create_user(username, password);
+            return res;
+        },
+    }
+
 });
 
-app.post('/settxt', (req, res) => {
 
-    console.log(`req`,req.body);
-    let {txt} = req.body;
-    console.log(`req ${txt}`, req.body)
-    db.set('current', txt);
-
-    res.send({});
-});
-
-
-
-app.listen(PORT, () => console.log(`Example app listening on port http://localhost:${PORT}!`));
+app.listen(PORT, () => console.log(`listening on port http://localhost:${PORT}`));
