@@ -1,4 +1,7 @@
 
+
+// autoroute HTTP routes object (method + express path)
+
 export function autoroute(app, obj) {
 
     ['get','post','put','delete'].forEach(method => {
@@ -19,3 +22,48 @@ export function autoroute(app, obj) {
 
 }
 
+
+// autoroute socket (auth/plain + socket name)
+
+export function socketroute(io, obj) {
+
+    let { auth = {}, plain = {} } = obj;
+
+    io.on('connection', socket => {
+
+        console.log('A user connected');
+
+        let state = {};
+        Object.keys(plain).forEach(name => {
+            socket.on(name, data => plain[name](data, socket, state))
+        });
+
+        Object.keys(auth).forEach(name => {
+            socket.on(name, data => {
+                if(!state.user) {
+                    console.log(`error: user not logged in`);
+                }
+                auth[name](data, state.user, socket, state);
+            });
+        })
+    
+        //Whenever someone disconnects this piece of code executed
+        socket.on('disconnect', function () {
+            console.log('A user disconnected');
+        });
+
+    });
+
+
+
+
+    // io.on('connection', socket => {
+    //     console.log('A user connected');
+    //     let state = {};
+    //     Object.keys(obj).forEach(name => {
+    //         socket.on(name, data => obj[name](data, socket, state))
+    //     });
+    // })
+
+
+}

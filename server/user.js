@@ -20,7 +20,19 @@ export async function hash_password(password) {
 }
 
 
-export async function get_user(username, password) {
+export async function login_user(username, password) {
+
+    let user = await get_user(username);
+
+    let correct = await check_password(password, user.hash);
+    if(!correct) {
+        return {error: 'Password Incorrect'}
+    }
+
+    return user;
+}
+
+export async function get_user(username) {
 
     let exists = await db.hexists('users', username);
     if(!exists) {
@@ -28,11 +40,6 @@ export async function get_user(username, password) {
     }
     let userjson = await db.hget('users', username);
     let user = JSON.parse(userjson);
-
-    let correct = await check_password(password, user.hash);
-    if(!correct) {
-        return {error: 'Password Incorrect'}
-    }
 
     return user;
 
@@ -53,9 +60,9 @@ export async function create_user(username, password, data = {}) {
 
 }
 
-export async function update_user(username, password, data = {}) {
+export async function update_user(username, data = {}) {
 
-    let res = await get_user(username, password);
+    let res = await get_user(username);
     if(res.error) {
         return res;
     }
@@ -63,6 +70,6 @@ export async function update_user(username, password, data = {}) {
 
     await db.hset('users', username, JSON.stringify(res));
 
-    return res;
+    return {username};
 
 }
