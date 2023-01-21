@@ -1,5 +1,7 @@
 
-import {db} from './redis.js';
+import {db, RedisSet, db_get, db_set} from './redis.js';
+
+const messages = new RedisSet('dm');
 
 export async function get_chat() {
 
@@ -20,3 +22,24 @@ export async function clear_chat() {
     return db.del('chat');
 
 }
+
+export async function get_dm(user) {
+
+    let obj = await messages.get(user);
+
+    return obj || {};
+
+}
+
+export async function send_dm(user_from, user_to, message) {
+
+    // let from_obj = await ge
+
+    let current = await get_dm(user_to);
+
+    current[user_from] = [...(current[user_from] || []), message];
+
+    await messages.put(user_to, current);
+
+}
+

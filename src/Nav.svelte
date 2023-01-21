@@ -2,7 +2,7 @@
 
     export let user;
 
-	import {logout} from './lib/user.js';
+	import {mode, logout} from './lib/user.js';
     import {clear} from './lib/chat.js';
 	import { Logout, Menu2, X } from "tabler-icons-svelte";
     import Chat from './Chat.svelte';
@@ -17,7 +17,12 @@
 
 <nav>
     <div class="left">
-        {user.username}
+        <span on:click={() => $mode = 'chat'}>
+            [{user.username}]
+        </span>
+        <!-- <span on:click={() => $mode = 'dm'}>
+            DMs
+        </span> -->
     </div>
     <div class="right">
         <button class="flat" on:click={togglemenu}>

@@ -4,6 +4,10 @@
 	import Login from './Login.svelte';
 	import Main from './Main.svelte';
 
+	fetch('/userlist').then(res => res.json()).then(res => {
+		console.log(`userlist`, res);
+	})
+
 </script>
 
 {#if $user}

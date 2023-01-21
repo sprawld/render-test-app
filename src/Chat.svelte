@@ -1,12 +1,13 @@
 <script>
 
-    import {onMount} from 'svelte';
+    import {onMount, tick} from 'svelte';
     import {conversation, chat} from './lib/chat.js'
     import UserIcon from './UserIcon.svelte';
 
     let msg = '';
     let long_msg = false;
     let textarea;
+    let chatbox;
 
     function postchat(evt) {
         if(evt) evt.preventDefault();
@@ -28,6 +29,9 @@
 
     onMount(() => {
         textarea.focus();
+        tick().then(() => {
+            chatbox.scrollTo(0, chatbox.scrollHeight);
+        })
     })
 
 </script>
@@ -37,7 +41,7 @@
     <button on:click={postchat}>Send</button>
 </form> -->
 
-<code id="chat">
+<code bind:this={chatbox} id="chat">
     {#each $conversation as {user, msg}}
         <div><span><strong>[{user}]</strong></span><span><pre>{msg}</pre></span></div>
     {/each}
@@ -55,22 +59,9 @@
 
 <style>
 
-    /* #chat > div {
-        border-bottom:1px solid rgb(0,0,0,0.8);
-        text-align:left;
-    }
-
-    #chat > div > span {
-        display:inline-block;
-        padding:10px;
-        border-radius:10px;
-        border:1px solid rgba(0,0,0,0.8);
-        vertical-align:middle;
-    } */
-
     #chat {
-        position:fixed;
-        top:50px;
+        position:absolute;
+        top:0;
         bottom:80px;
         left:0;
         width:100%;
@@ -90,7 +81,7 @@
     }
 
     #textbox {
-        position:fixed;
+        position:absolute;
         bottom:0;
         left:0;
         right:0;
@@ -102,7 +93,7 @@
         position:absolute;
         left:0;
         right:150px;
-        bottom:5px;
+        bottom:0;
         height:80px;
     }
 
@@ -115,15 +106,19 @@
     }
 
     #textbox textarea {
+        position:absolute;  
+        top:0;
+        left:0;
         width:100%;
         height:80px;
         font-size:24px;
         box-sizing:border-box;
-        border:none;
+        border:1px solid transparent;
         background:none;
         resize:none;
         margin:0;
     }
+    
 
     #textbox textarea:active {
         border:none;

@@ -4,6 +4,7 @@ import { socket } from './socket.js';
 
 export const user = writable(false)
 export const error = writable(false);
+export const mode = writable('chat');
 
 socket.on('login', data => {
     console.log(`login`, data);
