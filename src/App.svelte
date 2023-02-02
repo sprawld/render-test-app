@@ -1,21 +1,22 @@
 <script>
-	import {user} from './lib/user.js';
 
-	import Login from './Login.svelte';
-	import Main from './Main.svelte';
+    import Login from './components/Login.svelte';
+    import Nav from './components/Nav.svelte';
+    import Chat from './components/Chat.svelte';
 
-	fetch('/userlist').then(res => res.json()).then(res => {
-		console.log(`userlist`, res);
-	})
+    import {user} from './lib/socketapi.js';
 
 </script>
 
-{#if $user}
+{#if $user.username}
 
-	<Main user={$user}></Main>
+    <Nav>
+        <Chat></Chat>
+	</Nav>
 
 {:else}
 
-	<Login></Login>
+	<Login></Login>    
 
 {/if}
+

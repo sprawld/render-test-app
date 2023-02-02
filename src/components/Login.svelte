@@ -1,59 +1,68 @@
 <script>
 
-	import {user, error, login, create} from './lib/user.js';
-	import {palette} from './lib/colors.js';
+    import { Logout, Login, Plus, Menu2 } from "tabler-icons-svelte";
+    import {user, login, logout, send, post} from '../lib/socketapi.js';
+	import {palette} from '../lib/colors.js';
 
-	let userinput;
+    let {
+        username = '',
+        password = ''
+    } = JSON.parse(localStorage.getItem('user') || '{}');
 
-	import {tick} from 'svelte';
-	import { Logout, Login, Plus, Menu2 } from "tabler-icons-svelte";
-	
-	// elem
+    if(username && password) {
+        login(username, password);
+    }
 
-	let {username  = '', password = ''} = JSON.parse(localStorage.getItem('user') || '{}');
+    function loginuser(evt) {
+        evt.preventDefault();
+        login(username, password);
+    }
 
-	if(username && password) {
-		userlogin();
-	}
+    function logoutuser(evt) {
+        evt.preventDefault();
+        logout(username, password);
+    }
 
-	function userlogin(evt) {
+    function sendsecret() {
+        send('secret', {hello: 'world'});
+    }
+
+
+	async function createuser(evt) {
 		if(evt) evt.preventDefault();
-		login(username, password);
+		await post('/create', {username, password, data: {color: palette(2)[0]}});
+        login(username, password);
 	}
 
-	function usercreate(evt) {
-		if(evt) evt.preventDefault();
-		create(username, password, {color: palette(2)[0]});
-	}
 
 </script>
 
-<section id="login" class:loginerror={$error}>
+<section id="login" class:loginerror={$user.error}>
     <form>
         <div>
             <label for="username">Username</label>
-            <input id="username" bind:this={userinput} bind:value={username} />
+            <input id="username" bind:value={username} />
 
             <label for="password">Password</label>
             <input id="password" bind:value={password} />
         </div>
         <br>
 
-        {#if $error}
+        {#if $user.error}
 
             <div class="error">
-                {$error}
+                {$user.error}
             </div>
             <br>
             
         {/if}
 
         <div>
-            <button type="submit" on:click={userlogin}>
+            <button type="submit" on:click={loginuser}>
                 <Login></Login>
                 <span>Login</span>
             </button>
-            <button on:click={usercreate}>
+            <button on:click={createuser}>
                 <Plus></Plus>
                 <span>Create</span>
             </button>
