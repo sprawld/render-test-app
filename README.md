@@ -47,3 +47,20 @@ test app, playing around with render.com, encryption & server tech
     }
 
 }
+
+
+
+## JSON Store Subscription Model
+
+The aim is to allow subscriptions to multiple sources:
+
+- Postgres Table/List
+- Redis Data
+
+## Store API
+
+get(location) => data
+subscribe(location, iterator) => unsubscribe function
+
+each change to the store is an exec: put, add, remove
+
